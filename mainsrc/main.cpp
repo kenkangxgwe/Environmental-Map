@@ -43,6 +43,9 @@ bool firstMouse = true;
 std::vector<glm::vec3> InitCubeCoords(void);
 GLuint GenerateCubeMap(void);
 GLuint LoadTextures(char *textPath);
+
+// we modified the input order of the images so the images on sky box
+// look right.
 std::vector<const char *> cmapFiles = {"../../data/images/negx.jpg",
                                        "../../data/images/posx.jpg",
 									   "../../data/images/posy.jpg",
@@ -114,16 +117,20 @@ int main()
 	glViewport(0, 0, widthBuff, heightBuff);
 
 	// The teapot
+	// Intialize a instance form Geomotry class to read in the obj file of the teapot
 	Geometry teapot;
 	teapot.Initialize("../../data/models/teapot.obj");
 
+	// teapot VAO prep and manipulation
 	GLuint potVAO;
 	glGenVertexArrays(1, &potVAO);
+	//link shaders
 	Shader potShader("Shaders/reflection.vert", "Shaders/reflection.frag");
+	// the transform matrix translate from canonical to world view.
 	glm::mat4 model(glm::mat3(10.0f));
 	model = glm::translate<float>(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	//Do not uncomment this
+	// The vertex indices of the sky box
 	std::vector<glm::vec3> cubeVerts = InitCubeCoords();
 	unsigned int cubeIndex[] = {
 		// POS X
@@ -145,6 +152,8 @@ int main()
 		0, 4, 6,
 		0, 6, 2
 	};
+
+	// the environment box VAO VBO EBO prep and manipulation
 	GLuint cubeVAO, cubeVBO, cubeEBO;
 	glGenVertexArrays(1, &cubeVAO);
 	glBindVertexArray(cubeVAO);
@@ -157,6 +166,7 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
+	// link shaders
 	Shader cubeShader("Shaders/environment.vert", "Shaders/environment.frag");
 	GLuint cubeTex = GenerateCubeMap();
 
@@ -171,29 +181,35 @@ int main()
 
 		// Render
 		glm::mat4 ortho = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 300.0f);
+		// we multiply the field of view by 100 to capture the broadest sight.
 		glm::mat4 persp = glm::perspective(100 * glm::radians(camera.zoomfactor), (float)widthBuff / (float)heightBuff, 0.1f, 300.0f);
 		glm::mat4 projection = persp;
 
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glEnable(GL_BLEND);
+		// enable depth difference between teapot and envrionment box,
+		// so they do not block each other in viewing.
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		// the tranfrom matrix from world to camera view.
 		glm::mat4 view = camera.viewMat();
 		glm::mat4 fixView = glm::mat4(glm::mat3(view));
 
+		// set up the teapot shader and draw the tea pot
 		potShader.Use();
 		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform3fv(glGetUniformLocation(potShader.Program, "cameraPos"), 1, glm::value_ptr(camera.pos));
 		glBindVertexArray(potVAO);
+		// 8 is passed in as vertices and 9 as normals
 		teapot.Draw(8, 9);
+		// free the binding
 		glBindVertexArray(0);
 
+		// set up the environment box and draw it
 		glDepthFunc(GL_LEQUAL);
 		cubeShader.Use();
 		glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(fixView));
@@ -319,6 +335,9 @@ GLuint GenerateCubeMap(void)
 	glGenTextures(1, &texID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+	// read in each image from the data folder and map it to each of the
+	// six faces of the cub map.
 	for (int i = 0; i < 6; i++)
 	{
 		unsigned char *cmapData;
@@ -340,6 +359,8 @@ GLuint GenerateCubeMap(void)
 			std::cout << "The image is not found " << cmapFiles[i] << "." << std::endl;
 			SOIL_free_image_data(cmapData);
 		}
+
+		// filtering
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -350,6 +371,10 @@ GLuint GenerateCubeMap(void)
 	return texID;
 }
 
+// we implemented this class for a testing to draw a 2D image on to the screen.
+// this is not used to load the envrionment box, because the developer will have
+// declare the "targe" that requires too many parameters to be passed in this
+// function.
 GLuint LoadTextures(char * textPath)
 {
 	GLuint texID; // this should be set to the texture id
