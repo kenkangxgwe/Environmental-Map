@@ -59,7 +59,7 @@ GLfloat lastFrame = 0.0f;
 
 //----------------------------------------------------
 // Main entry point
-// TO DO - Manage all OpenGL draw calls here
+// DONE - Manage all OpenGL draw calls here
 // Create shader programs
 //          e.g. Shader shader("Shaders/shader.vert", "Shaders/shader.frag");
 // Load and use shader programs
@@ -113,63 +113,6 @@ int main()
 	glfwGetFramebufferSize(window, &widthBuff, &heightBuff);
 	glViewport(0, 0, widthBuff, heightBuff);
 
-	// Define Coordinates
-	float triCoord[] = {
-	  -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-	  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-	  -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-	  0.5f, 0.5f, 0.0f, 1.0f, 1.0f
-	};
-
-	unsigned int triIndex[] = {
-		0, 1, 3,
-		0, 2, 3
-	};
-
-	float cubeCoord[] = {
-	-100.0f,  100.0f, -100.0f,
-	-100.0f, -100.0f, -100.0f,
-	100.0f, -100.0f, -100.0f,
-	100.0f, -100.0f, -100.0f,
-	100.0f,  100.0f, -100.0f,
-	-100.0f,  100.0f, -100.0f,
-
-	-100.0f, -100.0f,  100.0f,
-	-100.0f, -100.0f, -100.0f,
-	-100.0f,  100.0f, -100.0f,
-	-100.0f,  100.0f, -100.0f,
-	-100.0f,  100.0f,  100.0f,
-	-100.0f, -100.0f,  100.0f,
-
-	100.0f, -100.0f, -100.0f,
-	100.0f, -100.0f,  100.0f,
-	100.0f,  100.0f,  100.0f,
-	100.0f,  100.0f,  100.0f,
-	100.0f,  100.0f, -100.0f,
-	100.0f, -100.0f, -100.0f,
-
-	-100.0f, -100.0f,  100.0f,
-	-100.0f,  100.0f,  100.0f,
-	100.0f,  100.0f,  100.0f,
-	100.0f,  100.0f,  100.0f,
-	100.0f, -100.0f,  100.0f,
-	-100.0f, -100.0f,  100.0f,
-
-	-100.0f,  100.0f, -100.0f,
-	100.0f,  100.0f, -100.0f,
-	100.0f,  100.0f,  100.0f,
-	100.0f,  100.0f,  100.0f,
-	-100.0f,  100.0f,  100.0f,
-	-100.0f,  100.0f, -100.0f,
-
-	-100.0f, -100.0f, -100.0f,
-	-100.0f, -100.0f,  100.0f,
-	100.0f, -100.0f, -100.0f,
-	100.0f, -100.0f, -100.0f,
-	-100.0f, -100.0f,  100.0f,
-	100.0f, -100.0f,  100.0f
-	};
-
 	// The teapot
 	Geometry teapot;
 	teapot.Initialize("../../data/models/teapot.obj");
@@ -180,49 +123,40 @@ int main()
 	glm::mat4 model(glm::mat3(10.0f));
 	model = glm::translate<float>(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	////Do not uncomment this
-	//std::vector<glm::vec3> cubeVerts = InitCubeCoords();
-	//unsigned int cubeIndex[] = {
-	//	// POS X
-	//	4, 5, 7,
-	//	4, 7, 6,
-	//	// NEG X
-	//	0, 3, 1,
-	//	0, 2, 3,
-	//	// POS Y
-	//	2, 7, 3,
-	//	2, 6, 7,
-	//	// NEG Y
-	//	0, 1, 5,
-	//	0, 5, 4,
-	//	// POS Z
-	//	1, 7, 5,
-	//	1, 3, 7,
-	//	// NEG Z
-	//	0, 4, 6,
-	//	0, 6, 2
-	//};
-	//GLuint cubeVAO, cubeVBO, cubeEBO;
-	//glGenVertexArrays(1, &cubeVAO);
-	//glGenBuffers(1, &cubeVBO);
-	//glGenBuffers(1, &cubeEBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVerts), &cubeVerts[0][0], GL_STATIC_DRAW);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndex), cubeIndex, GL_STATIC_DRAW);
-	//glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
-	//glEnableVertexAttribArray(0);
-
-	// The skybox
-	GLuint VAO, VBO;
-
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeCoord), cubeCoord, GL_STATIC_DRAW);
+	//Do not uncomment this
+	std::vector<glm::vec3> cubeVerts = InitCubeCoords();
+	unsigned int cubeIndex[] = {
+		// POS X
+		4, 5, 7,
+		4, 7, 6,
+		// NEG X
+		0, 3, 1,
+		0, 2, 3,
+		// POS Y
+		2, 7, 3,
+		2, 6, 7,
+		// NEG Y
+		0, 1, 5,
+		0, 5, 4,
+		// POS Z
+		1, 7, 5,
+		1, 3, 7,
+		// NEG Z
+		0, 4, 6,
+		0, 6, 2
+	};
+	GLuint cubeVAO, cubeVBO, cubeEBO;
+	glGenVertexArrays(1, &cubeVAO);
+	glBindVertexArray(cubeVAO);
+	glGenBuffers(1, &cubeVBO);
+	glGenBuffers(1, &cubeEBO);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, cubeVerts.size() * sizeof(glm::vec3), &cubeVerts[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndex), cubeIndex, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
 	Shader cubeShader("Shaders/environment.vert", "Shaders/environment.frag");
 	GLuint cubeTex = GenerateCubeMap();
 
@@ -237,7 +171,7 @@ int main()
 
 		// Render
 		glm::mat4 ortho = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 300.0f);
-		glm::mat4 persp = glm::perspective(1000 * glm::radians(camera.zoomfactor), (float)widthBuff / (float)heightBuff, 0.1f, 300.0f);
+		glm::mat4 persp = glm::perspective(100 * glm::radians(camera.zoomfactor), (float)widthBuff / (float)heightBuff, 0.1f, 300.0f);
 		glm::mat4 projection = persp;
 
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -265,8 +199,8 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(fixView));
 		glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(cubeVAO);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		glfwPollEvents();
@@ -280,8 +214,8 @@ int main()
 	}
 
 	glDeleteVertexArrays(1, &potVAO);
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	glDeleteVertexArrays(1, &cubeVAO);
+	glDeleteBuffers(1, &cubeVBO);
 
 	// end process
 	glfwTerminate();
@@ -367,7 +301,7 @@ void KeyMovement()
 }
 
 //=====================================================================
-// TO DO:
+// DONE
 // Set-up Cube Map
 // 1. Generate the texture id and bind it
 //    Use  glGenTextures and glBindTexture for  GL_TEXTURE_CUBE_MAP
@@ -447,7 +381,7 @@ GLuint LoadTextures(char * textPath)
 }
 
 //=====================================================================
-// TO DO:
+// DONE:
 // Set-up Cube Coordiates
 // Initialize the cubemap coordinates.
 // Returns a std::vector<glm::vec3>  with the coordinates
@@ -455,10 +389,11 @@ GLuint LoadTextures(char * textPath)
 std::vector<glm::vec3> InitCubeCoords(void)
 {
 	std::vector<glm::vec3> input;
+	int cubeLength = 100;
 	for (int i = -1; i <= 1; i += 2) {
 		for (int j = -1; j <= 1; j += 2) {
 			for (int k = -1; k <= 1; k += 2) {
-				input.push_back(glm::vec3(i, j, k));
+				input.push_back(glm::vec3(i, j, k) * glm::vec3(cubeLength));
 			}
 		}
 	}
