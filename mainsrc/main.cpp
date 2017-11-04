@@ -197,25 +197,25 @@ int main()
 	glm::mat4 model(glm::mat3(0.2f));
 	model = glm::translate<float>(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	//Do not uncomment this
+	////Do not uncomment this
 	//std::vector<glm::vec3> cubeVerts = InitCubeCoords();
 	//unsigned int cubeIndex[] = {
-	//	 POS X
+	//	// POS X
 	//	4, 5, 7,
 	//	4, 7, 6,
-	//	 NEG X
+	//	// NEG X
 	//	0, 3, 1,
 	//	0, 2, 3,
-	//	 POS Y
+	//	// POS Y
 	//	2, 7, 3,
 	//	2, 6, 7,
-	//	 NEG Y
+	//	// NEG Y
 	//	0, 1, 5,
 	//	0, 5, 4,
-	//	 POS Z
+	//	// POS Z
 	//	1, 7, 5,
 	//	1, 3, 7,
-	//	 NEG Z
+	//	// NEG Z
 	//	0, 4, 6,
 	//	0, 6, 2
 	//};
@@ -259,17 +259,17 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glm::mat4 view = camera.viewMat();
-		glm::mat4 fixView = glm::mat4(glm::mat3(camera.viewMat()));
+		glm::mat4 fixView = glm::mat4(glm::mat3(view));
 
-		potShader.Use();
-		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glBindVertexArray(potVAO);
-		teapot.Draw(8, 9);
-		glBindVertexArray(0);
+		//potShader.Use();
+		//glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		//glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		//glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		//glBindVertexArray(potVAO);
+		//teapot.Draw(8, 9);
+		//glBindVertexArray(0);
 
-		glDepthFunc(GL_LEQUAL);
+		//glDepthFunc(GL_LEQUAL);
 		cubeShader.Use();
 		glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(fixView));
 		glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -318,18 +318,22 @@ void KeyCallback(GLFWwindow *window, int key, int scan, int act, int mode)
 
 	if (key == GLFW_KEY_UP && act == GLFW_PRESS)
 	{
+		camera.pitch += 1.0f;
 	}
 
 	if (key == GLFW_KEY_DOWN && act == GLFW_PRESS)
 	{
+		camera.pitch -= 1.0f;
 	}
 
 	if (key == GLFW_KEY_LEFT && act == GLFW_PRESS)
 	{
+		camera.yaw -= 1.0f;
 	}
 
 	if (key == GLFW_KEY_RIGHT && act == GLFW_PRESS)
 	{
+		camera.yaw += 1.0f;
 	}
 	//updating keys table
 	if (act == GLFW_PRESS)
