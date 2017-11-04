@@ -13,8 +13,7 @@ uniform vec3 cameraPos;
 void main()
 {
   vec4 worldPos = model * vec4(vertices, 1.0);
-  vec4 worldNorm = inverse(transpose(model)) * vec4(normals, 1.0);
-  reflectN = normalize(reflect(vec3(worldPos) - cameraPos, vec3(worldNorm)));
-  reflectN = vec3(worldPos);
+  vec3 worldNorm = normalize(mat3(transpose(inverse(model))) * normals);
+  reflectN = normalize(reflect(normalize(vec3(worldPos) - cameraPos), worldNorm));
   gl_Position = projection * view * worldPos;
 }
