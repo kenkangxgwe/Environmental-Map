@@ -273,6 +273,7 @@ int main()
 		glBindVertexArray(potVAO);
 		teapot.Draw(8, 9);
 		glBindVertexArray(0);
+
 		//glDepthFunc(GL_LEQUAL);
 		//cubeShader.Use();
 		//glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(fixView));
