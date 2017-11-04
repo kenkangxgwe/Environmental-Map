@@ -170,23 +170,6 @@ int main()
 	100.0f, -100.0f,  100.0f
 	};
 
-	// A triangle for test
-	//GLuint triVAO, triVBO, triEBO;
-	//glGenVertexArrays(1, &triVAO);
-	//glGenBuffers(1, &triVBO);
-	//glGenBuffers(1, &triEBO);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, triVBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(triCoord), triCoord, GL_STATIC_DRAW);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triEBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triIndex), triIndex, GL_STATIC_DRAW);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
-	//Shader triShader("Shaders/tri.vert", "Shaders/tri.frag");
-	//GLuint triTexture = LoadTextures("../../data/images/test.bmp");
-
 	// The teapot
 	Geometry teapot;
 	teapot.Initialize("../../data/models/teapot.obj");
@@ -194,7 +177,7 @@ int main()
 	GLuint potVAO;
 	glGenVertexArrays(1, &potVAO);
 	Shader potShader("Shaders/reflection.vert", "Shaders/reflection.frag");
-	glm::mat4 model(glm::mat3(1.0f));
+	glm::mat4 model(glm::mat3(10.0f));
 	model = glm::translate<float>(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	////Do not uncomment this
@@ -259,6 +242,9 @@ int main()
 
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//glEnable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -269,28 +255,19 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "cameraPos"), 1, GL_FALSE, glm::value_ptr(camera.pos));
+		glUniform3fv(glGetUniformLocation(potShader.Program, "cameraPos"), 1, glm::value_ptr(camera.pos));
 		glBindVertexArray(potVAO);
 		teapot.Draw(8, 9);
 		glBindVertexArray(0);
 
-		//glDepthFunc(GL_LEQUAL);
-		//cubeShader.Use();
-		//glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(fixView));
-		//glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		//glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
-		//glBindVertexArray(VAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-		//glBindVertexArray(0);
-		//glDepthFunc(GL_LESS); // set depth function back to default
-
-		//triShader.Use();
-		//glUniformMatrix4fv(glGetUniformLocation(triShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		//glUniformMatrix4fv(glGetUniformLocation(triShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(fixView));
-		//glUniformMatrix4fv(glGetUniformLocation(triShader.Program, "ortho"), 1, GL_FALSE, glm::value_ptr(ortho));
-		//glBindTexture(GL_TEXTURE_2D, triTexture);
-		//glBindVertexArray(triVAO);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDepthFunc(GL_LEQUAL);
+		cubeShader.Use();
+		glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(fixView));
+		glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
 
 		glfwPollEvents();
 		KeyMovement();
@@ -324,22 +301,22 @@ void KeyCallback(GLFWwindow *window, int key, int scan, int act, int mode)
 
 	if (key == GLFW_KEY_UP && act == GLFW_PRESS)
 	{
-		camera.pitch += 1.0f;
+		camera.pitch += 10.0f;
 	}
 
 	if (key == GLFW_KEY_DOWN && act == GLFW_PRESS)
 	{
-		camera.pitch -= 1.0f;
+		camera.pitch -= 10.0f;
 	}
 
 	if (key == GLFW_KEY_LEFT && act == GLFW_PRESS)
 	{
-		camera.yaw -= 1.0f;
+		camera.yaw -= 10.0f;
 	}
 
 	if (key == GLFW_KEY_RIGHT && act == GLFW_PRESS)
 	{
-		camera.yaw += 1.0f;
+		camera.yaw += 10.0f;
 	}
 	//updating keys table
 	if (act == GLFW_PRESS)
