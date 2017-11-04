@@ -43,12 +43,12 @@ bool firstMouse = true;
 std::vector<glm::vec3> InitCubeCoords(void);
 GLuint GenerateCubeMap(void);
 GLuint LoadTextures(char *textPath);
-std::vector<const char *> cmapFiles = { "../../data/images/posx.jpg",
-									   "../../data/images/negx.jpg",
+std::vector<const char *> cmapFiles = {"../../data/images/negx.jpg",
+                                       "../../data/images/posx.jpg",
 									   "../../data/images/posy.jpg",
 									   "../../data/images/negy.jpg",
-									   "../../data/images/posz.jpg",
-									   "../../data/images/negz.jpg" };
+									   "../../data/images/negz.jpg",
+                                       "../../data/images/posz.jpg"};
 
 //----------------------------------------------
 // Camera
@@ -127,47 +127,47 @@ int main()
 	};
 
 	float cubeCoord[] = {
-	-1.0f,  1.0f, -1.0f,
-	-1.0f, -1.0f, -1.0f,
-	1.0f, -1.0f, -1.0f,
-	1.0f, -1.0f, -1.0f,
-	1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
+	-100.0f,  100.0f, -100.0f,
+	-100.0f, -100.0f, -100.0f,
+	100.0f, -100.0f, -100.0f,
+	100.0f, -100.0f, -100.0f,
+	100.0f,  100.0f, -100.0f,
+	-100.0f,  100.0f, -100.0f,
 
-	-1.0f, -1.0f,  1.0f,
-	-1.0f, -1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f,  1.0f,
-	-1.0f, -1.0f,  1.0f,
+	-100.0f, -100.0f,  100.0f,
+	-100.0f, -100.0f, -100.0f,
+	-100.0f,  100.0f, -100.0f,
+	-100.0f,  100.0f, -100.0f,
+	-100.0f,  100.0f,  100.0f,
+	-100.0f, -100.0f,  100.0f,
 
-	1.0f, -1.0f, -1.0f,
-	1.0f, -1.0f,  1.0f,
-	1.0f,  1.0f,  1.0f,
-	1.0f,  1.0f,  1.0f,
-	1.0f,  1.0f, -1.0f,
-	1.0f, -1.0f, -1.0f,
+	100.0f, -100.0f, -100.0f,
+	100.0f, -100.0f,  100.0f,
+	100.0f,  100.0f,  100.0f,
+	100.0f,  100.0f,  100.0f,
+	100.0f,  100.0f, -100.0f,
+	100.0f, -100.0f, -100.0f,
 
-	-1.0f, -1.0f,  1.0f,
-	-1.0f,  1.0f,  1.0f,
-	1.0f,  1.0f,  1.0f,
-	1.0f,  1.0f,  1.0f,
-	1.0f, -1.0f,  1.0f,
-	-1.0f, -1.0f,  1.0f,
+	-100.0f, -100.0f,  100.0f,
+	-100.0f,  100.0f,  100.0f,
+	100.0f,  100.0f,  100.0f,
+	100.0f,  100.0f,  100.0f,
+	100.0f, -100.0f,  100.0f,
+	-100.0f, -100.0f,  100.0f,
 
-	-1.0f,  1.0f, -1.0f,
-	1.0f,  1.0f, -1.0f,
-	1.0f,  1.0f,  1.0f,
-	1.0f,  1.0f,  1.0f,
-	-1.0f,  1.0f,  1.0f,
-	-1.0f,  1.0f, -1.0f,
+	-100.0f,  100.0f, -100.0f,
+	100.0f,  100.0f, -100.0f,
+	100.0f,  100.0f,  100.0f,
+	100.0f,  100.0f,  100.0f,
+	-100.0f,  100.0f,  100.0f,
+	-100.0f,  100.0f, -100.0f,
 
-	-1.0f, -1.0f, -1.0f,
-	-1.0f, -1.0f,  1.0f,
-	1.0f, -1.0f, -1.0f,
-	1.0f, -1.0f, -1.0f,
-	-1.0f, -1.0f,  1.0f,
-	1.0f, -1.0f,  1.0f
+	-100.0f, -100.0f, -100.0f,
+	-100.0f, -100.0f,  100.0f,
+	100.0f, -100.0f, -100.0f,
+	100.0f, -100.0f, -100.0f,
+	-100.0f, -100.0f,  100.0f,
+	100.0f, -100.0f,  100.0f
 	};
 
 	// A triangle for test
@@ -194,7 +194,7 @@ int main()
 	GLuint potVAO;
 	glGenVertexArrays(1, &potVAO);
 	Shader potShader("Shaders/reflection.vert", "Shaders/reflection.frag");
-	glm::mat4 model(glm::mat3(0.2f));
+	glm::mat4 model(glm::mat3(1.0f));
 	model = glm::translate<float>(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	////Do not uncomment this
@@ -234,6 +234,7 @@ int main()
 	GLuint VAO, VBO;
 
 	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeCoord), cubeCoord, GL_STATIC_DRAW);
@@ -242,9 +243,6 @@ int main()
 	Shader cubeShader("Shaders/environment.vert", "Shaders/environment.frag");
 	GLuint cubeTex = GenerateCubeMap();
 
-	glm::mat4 ortho = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 300.0f);
-	glm::mat4 persp = glm::perspective(1.57f, (float)widthBuff / (float)heightBuff, 0.1f, 30.0f);
-	glm::mat4 projection = persp;
 
 	//game loop, as long as window is open
 	while (!glfwWindowShouldClose(window))
@@ -255,28 +253,35 @@ int main()
 		lastFrame = currentFrame;
 
 		// Render
+		glm::mat4 ortho = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 300.0f);
+		glm::mat4 persp = glm::perspective(1000 * glm::radians(camera.zoomfactor), (float)widthBuff / (float)heightBuff, 0.1f, 300.0f);
+		glm::mat4 projection = persp;
+
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glEnable(GL_BLEND);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glm::mat4 view = camera.viewMat();
 		glm::mat4 fixView = glm::mat4(glm::mat3(view));
 
-		//potShader.Use();
-		//glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		//glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		//glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		//glBindVertexArray(potVAO);
-		//teapot.Draw(8, 9);
-		//glBindVertexArray(0);
-
-		//glDepthFunc(GL_LEQUAL);
-		cubeShader.Use();
-		glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(fixView));
-		glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		potShader.Use();
+		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "cameraPos"), 1, GL_FALSE, glm::value_ptr(camera.pos));
+		glBindVertexArray(potVAO);
+		teapot.Draw(8, 9);
 		glBindVertexArray(0);
+		//glDepthFunc(GL_LEQUAL);
+		//cubeShader.Use();
+		//glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(fixView));
+		//glUniformMatrix4fv(glGetUniformLocation(cubeShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		//glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
+		//glBindVertexArray(VAO);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glBindVertexArray(0);
+		//glDepthFunc(GL_LESS); // set depth function back to default
 
 		//triShader.Use();
 		//glUniformMatrix4fv(glGetUniformLocation(triShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
