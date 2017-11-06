@@ -20,15 +20,14 @@ MetaballFactory::MetaballFactory(void)
 {
 	// set up a few metablls when intializing the factory
 	//TODO: check for max and min limits in the metaball list
-	Metaball leftMetaball = Metaball(glm::vec3(-0.5,0,0), 0.3);
-	mDefaultMetaball = Metaball(glm::vec3(0,0,0), 0.5);
+	Metaball leftMetaball = Metaball(glm::vec3(-0.2,0,0), 0.3);
+	mDefaultMetaball = Metaball(glm::vec3(0.2,0,0), 0.5);
 	// store the metaballs in the list and generate a coresponding list
 	// of directions for each metaball to float to.
 	mMetaballs.push_back(mDefaultMetaball);
-	mBallDir.push_back(getRandomDir(mDefaultMetaball));
 	mMetaballs.push_back(leftMetaball);
-	mBallDir.push_back(getRandomDir(leftMetaball));
-	mGrid.Initialize(0.3);
+	// the param must be an integer
+	mGrid.Initialize(5);
 }
 
 
@@ -57,13 +56,15 @@ void MetaballFactory::ClearGrid(void)
 void MetaballFactory::UpdatePositions(void)
 {
 	Metaball *currBall, *otherBall;
+	// the axis the metaballs will move around about
+	float angle = 5.0f;   // set the default degrees of moment
+	glm::vec3 centerAxis = glm::vec3(0, 1, 0);
 	float distance = 0.0f;
 	float trackRadius = 0.0f;
-	float angle = 5.0f;   // set the default degrees of moment
-	trackRadius = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1 - currBall->sRadius)));
 	for (int i = 0; i < mMetaballs.size(); i++)
 	{
 		currBall = &mMetaballs[i];
+		trackRadius = glm::length(currBall->position - centerAxis);
 		// randomly pick a track for the current moving ball
 		for (int j = 0; j < mMetaballs.size(); j++)
 		{
@@ -73,29 +74,10 @@ void MetaballFactory::UpdatePositions(void)
 				distance = glm::length(currBall->position - otherBall->position);
 			}
 		}
-
 		//x
-		currBall->position.x -= cos(angle / distance) * trackRadius;
-		//y
-		currBall->position.y += sin(angle / distance) * trackRadius;
+		glm::gtx::rotate_vector::rotate(currBall->position, angle, centerAxis);
 	}
 }
-
-//==============================================================
-// TO DO: Project 4
-// Randomly generate a moving vector for each metaball
-//================================================================
-glm::vec3 MetaballFactory::getRandomDir(Metaball ball)
-{
-	glm::vec3 dir;
-	dir.x = rand() % 1;
-	dir.y = rand() % 1;
-	dir.z = rand() % 1;
-
-	return dir;
-}
-
-
 
 //=====================================================================
 // TO DO:Project 4
