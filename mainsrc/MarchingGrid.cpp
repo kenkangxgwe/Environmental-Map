@@ -35,14 +35,14 @@ MarchingGrid::~MarchingGrid()
 //----------------------------------------------------
 bool MarchingGrid::Initialize(float size)
 {
-	mGridSize = 50 / size + 1;
-	float cellSize = 1.0 / mGridSize;
+	mGridSize = 15 / size + 1;
+	float cellSize = 2.0 / mGridSize;
 	vertices.reserve((mGridSize + 1)*(mGridSize + 1)*(mGridSize + 1));
 	for (int i = 0; i <= mGridSize; i++) {
 		for (int j = 0; j <= mGridSize; j++) {
 			for (int k = 0; k <= mGridSize; k++) {
 				CubeVert newVert;
-				newVert.position = glm::vec3(k, i, j) * float(mGridSize);
+				newVert.position = glm::vec3(k, i, j) * float(cellSize) - glm::vec3(1.0f, 1.0f, 1.0f);
 				vertices.push_back(newVert);
 			}
 		}
@@ -58,7 +58,7 @@ bool MarchingGrid::Initialize(float size)
 		newCube.cVertices[4] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 1)];
 		newCube.cVertices[5] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 1) + 1];
 		newCube.cVertices[6] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 2) + 1];
-		newCube.cVertices[6] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 2)];
+		newCube.cVertices[7] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 2)];
 		cubes.push_back(newCube);
 	}
 
@@ -93,11 +93,12 @@ bool MarchingGrid::IsosurfaceToPolygons(float level, Triag &triangles)
 {
 	for (auto &cube : cubes) {
 		int edgeIndex = 0;
-		for (int i = 8; i > 0; i--) {
-			edgeIndex |= (cube.cVertices[i]->surfaceValue < level);
+		for (int i = 7; i >= 0; i--) {
 			edgeIndex <<= 1;
+			edgeIndex |= (cube.cVertices[i]->surfaceValue < level);
 		}
 		int edgeList = edgeTable[edgeIndex];
+		std::vector<glm::vec3> edgeVert(12);
 		for (int i = 0; i < 12; i++) {
 			if (edgeList & 1) {
 				float v1 = cube.cVertices[cubeEdgeVerts[2 * i]]->surfaceValue;
@@ -106,9 +107,15 @@ bool MarchingGrid::IsosurfaceToPolygons(float level, Triag &triangles)
 				glm::vec3 p1 = cube.cVertices[cubeEdgeVerts[2 * i]]->position;
 				glm::vec3 p2 = cube.cVertices[cubeEdgeVerts[2 * i + 1]]->position;
 				glm::vec3 intersection = p2 + (v2 - level) / (v2 - v1) * (p1 - p2);
-				triangles.points.push_back(intersection);
+				edgeVert[i] = intersection;
 			}
 			edgeList >>= 1;
+		}
+		const int *triList = triTable[edgeIndex];
+		for (int i = 0; i < 16; i++) {
+			if (triList[i] == -1)
+				break;
+			triangles.points.push_back(edgeVert[triList[i]]);
 		}
 	}
 

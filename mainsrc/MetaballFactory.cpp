@@ -56,27 +56,27 @@ void MetaballFactory::ClearGrid(void)
 //================================================================
 void MetaballFactory::UpdatePositions(void)
 {
-	Metaball currBall, otherBall;
+	Metaball *currBall, *otherBall;
 	float distance = 0;
 	float trackRadius = 0;
 	float angle = 100;   // set the default degrees of moment
 	for (int i = 0; i < mMetaballs.size(); i++)
 	{
-		currBall = mMetaballs.at(i);
+		currBall = &mMetaballs[i];
 		// randomly pick a track for the current moving ball
-		trackRadius = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1 - currBall.sRadius)));
-		for (int j = 0; mMetaballs.size(); j++)
+		trackRadius = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1 - currBall->sRadius)));
+		for (int j = 0; j < mMetaballs.size(); j++)
 		{
-			otherBall = mMetaballs.at(j);
-			if (currBall.position != otherBall.position && currBall.sRadius != otherBall.sRadius
-				 && (currBall.position - otherBall.position).length() < distance)
+			otherBall = &mMetaballs[j];
+			if (currBall->position != otherBall->position && currBall->sRadius != otherBall->sRadius
+				 && glm::length(currBall->position - otherBall->position) < 2.0*std::sqrt(3.0))
 			{
-				distance = (currBall.position - otherBall.position).length();
+				distance = glm::length(currBall->position - otherBall->position);
 
 				//x
-				currBall.position.x = currBall.position.x + cos(angle * (1 - distance)) * trackRadius;
+				currBall->position.x = currBall->position.x - cos(angle * (1 - distance)) * trackRadius;
 				//y
-				currBall.position.x = currBall.position.x + sin(angle * (1 - distance)) * trackRadius;
+				currBall->position.y = currBall->position.y + sin(angle * (1 - distance)) * trackRadius;
 			}
 		}
 	}
@@ -114,31 +114,32 @@ glm::vec3 MetaballFactory::getRandomDir(Metaball ball)
 //=====================================================================
 void MetaballFactory::Update(void)
 {
-	std::vector<GridCube> cubes = mGrid.cubes;
-	Metaball currBall;
-	CubeVert currCV;
-	glm::vec3 currVer, currNor;
+	Metaball *currBall;
+	CubeVert *currCV;
 
 	ClearGrid();
+	UpdatePositions();
 	// update the metaball postions
 	for (int i = 0; i < mMetaballs.size(); i++)
 	{
 		//TODO: update the positions inversely to the propertion of distance
-		currBall = mMetaballs.at(i);
-		currBall.position = currBall.position + mBallDir.at(i);
+		currBall = &mMetaballs[i];
+		currBall->position += mBallDir[i];
 
 		// update the distance between each vertex in the marching grid cube
 		// to its center
 
 		// update the gribs vertices accordingly
-		for (int j = 0; mGrid.vertices.size(); j++)
+		for (int j = 0; j < mGrid.vertices.size(); j++)
 		{
-			currCV = mGrid.vertices.at(j);
-			currCV.surfaceValue = (currCV.position - currBall.position).length();
+			currCV = &mGrid.vertices[j];
+			currCV->surfaceValue = glm::length(currCV->position - currBall->position);
+			assert(currCV->surfaceValue <= 3.5);
 		}
 		// if the isosurface is too big or too small for the marching cube
 		// to draw, do not update the positions
-		if (!mGrid.IsosurfaceToPolygons(currBall.sRadius, mTriangles))
+		int startIndex = mTriangles.points.size();
+		if (!mGrid.IsosurfaceToPolygons(currBall->sRadius, mTriangles))
 		{
 			return;
 		}
@@ -146,11 +147,9 @@ void MetaballFactory::Update(void)
 		// update the normals for the returned triangle mes
 		// calculate normal by substracting one cube vertex by the position of the metaball,
 	    // only calculate the normal for the grid thats intersected by the ball.
-		for (int k = 0; k < mTriangles.points.size(); k++)
+		for (int k = startIndex; k < mTriangles.points.size(); k++)
 		{
-			currVer = mTriangles.points.at(k);
-			currNor = mTriangles.normals.at(k);
-			currNor = glm::normalize(currVer - currBall.position);
+			mTriangles.normals.push_back(glm::normalize(mTriangles.points[k] - currBall->position));
 		}
 
 	}

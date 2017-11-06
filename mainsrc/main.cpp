@@ -132,24 +132,35 @@ int main()
 
 	// The metaballs
 	MetaballFactory metaFact;
-	metaFact.Update();
-	GLuint ballVAO, ballPosVBO, ballNormVBO;
+	GLuint ballVAO, ballVBO;
+	GLuint ballPosVBO, ballNormVBO;
 	glGenVertexArrays(1, &ballVAO);
 	glBindVertexArray(ballVAO);
+	//glGenBuffers(1, &ballVBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, ballVBO);
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.points[0]);
+	//glBufferSubData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), metaFact.mTriangles.normals.size() * sizeof(glm::vec3), &metaFact.mTriangles.normals[0]);
+	//glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//glEnableVertexAttribArray(8);
+	//glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(metaFact.mTriangles.points.size() * sizeof(glm::vec3)));
+	//glEnableVertexAttribArray(9);
+
+	//std::vector<glm::vec3> test;
+	//test.push_back(glm::vec3(0.8f,0.8f,0.0f));
+	//test.push_back(glm::vec3(0.0f,0.8f,0.0f));
+	//test.push_back(glm::vec3(0.8f,0.0f,0.0f));
 	glGenBuffers(1, &ballPosVBO);
 	glGenBuffers(1, &ballNormVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, ballPosVBO);
-	glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.points[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(8);
 	glBindBuffer(GL_ARRAY_BUFFER, ballNormVBO);
-	glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.normals.size() * sizeof(glm::vec3), &metaFact.mTriangles.normals[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(9);
 
 	Shader ballShader("Shaders/reflection.vert", "Shaders/reflection.frag");
 	// the transform matrix translate from canonical to world view.
-	glm::mat4 model(glm::mat3(10.0f));
+	glm::mat4 model(glm::mat3(50.0f));
 	model = glm::translate<float>(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// The vertex indices of the sky box
@@ -192,6 +203,8 @@ int main()
 	Shader cubeShader("Shaders/environment.vert", "Shaders/environment.frag");
 	GLuint cubeTex = GenerateCubeMap();
 
+	// Orphan Expression
+	metaFact.Update();
 
 	//game loop, as long as window is open
 	while (!glfwWindowShouldClose(window))
@@ -238,6 +251,13 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(ballShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform3fv(glGetUniformLocation(ballShader.Program, "cameraPos"), 1, glm::value_ptr(camera.pos));
 		glBindVertexArray(ballVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, ballPosVBO);
+		if (!metaFact.mTriangles.points.size())
+			continue;
+		glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.points[0], GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, ballNormVBO);
+		glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.normals[0], GL_DYNAMIC_DRAW);
+		//glDrawArrays(GL_TRIANGLES, 0 , metaFact.mTriangles.points.size());
 		glDrawArrays(GL_TRIANGLES, 0 , metaFact.mTriangles.points.size());
 		// free the binding
 		glBindVertexArray(0);

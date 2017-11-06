@@ -16,4 +16,5 @@ void main()
   vec3 worldNorm = normalize(mat3(transpose(inverse(model))) * normals);
   reflectN = normalize(reflect(normalize(vec3(worldPos) - cameraPos), worldNorm));
   gl_Position = projection * view * worldPos;
+  // gl_Position = vec4(vertices, 1.0);
 }
