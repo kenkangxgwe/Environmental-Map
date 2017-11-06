@@ -35,8 +35,9 @@ MarchingGrid::~MarchingGrid()
 //----------------------------------------------------
 bool MarchingGrid::Initialize(float size)
 {
-	mGridSize = 100 / size + 1;
-	float cellSize = 1 / mGridSize;
+	mGridSize = 50 / size + 1;
+	float cellSize = 1.0 / mGridSize;
+	vertices.reserve((mGridSize + 1)*(mGridSize + 1)*(mGridSize + 1));
 	for (int i = 0; i <= mGridSize; i++) {
 		for (int j = 0; j <= mGridSize; j++) {
 			for (int k = 0; k <= mGridSize; k++) {
@@ -47,16 +48,18 @@ bool MarchingGrid::Initialize(float size)
 		}
 	}
 	cubes.reserve(mGridSize*mGridSize*mGridSize);
-	for (int i = 0; i < cubes.size(); i++) {
+	for (int i = 0; i < mGridSize*mGridSize*mGridSize; i++) {
 		int offset = i / (mGridSize + 1);
-		cubes[i].cVertices[0] = &vertices[i - offset];
-		cubes[i].cVertices[1] = &vertices[i - offset + 1];
-		cubes[i].cVertices[2] = &vertices[i - offset + mGridSize + 2];
-		cubes[i].cVertices[3] = &vertices[i - offset + mGridSize + 1];
-		cubes[i].cVertices[4] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 1)];
-		cubes[i].cVertices[5] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 1) + 1];
-		cubes[i].cVertices[6] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 2) + 1];
-		cubes[i].cVertices[6] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 2)];
+		GridCube newCube;
+		newCube.cVertices[0] = &vertices[i - offset];
+		newCube.cVertices[1] = &vertices[i - offset + 1];
+		newCube.cVertices[2] = &vertices[i - offset + mGridSize + 2];
+		newCube.cVertices[3] = &vertices[i - offset + mGridSize + 1];
+		newCube.cVertices[4] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 1)];
+		newCube.cVertices[5] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 1) + 1];
+		newCube.cVertices[6] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 2) + 1];
+		newCube.cVertices[6] = &vertices[i - offset + (mGridSize + 1) * (mGridSize + 2)];
+		cubes.push_back(newCube);
 	}
 
     return(true);

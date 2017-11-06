@@ -137,6 +137,7 @@ int main()
 	glGenVertexArrays(1, &ballVAO);
 	glBindVertexArray(ballVAO);
 	glGenBuffers(1, &ballPosVBO);
+	glGenBuffers(1, &ballNormVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, ballPosVBO);
 	glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.points[0], GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -262,7 +263,8 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
-	glDeleteVertexArrays(1, &potVAO);
+	//glDeleteVertexArrays(1, &potVAO);
+	glDeleteVertexArrays(1, &ballVAO);
 	glDeleteVertexArrays(1, &cubeVAO);
 	glDeleteBuffers(1, &cubeVBO);
 

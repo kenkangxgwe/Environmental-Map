@@ -28,6 +28,7 @@ MetaballFactory::MetaballFactory(void)
 	mBallDir.push_back(getRandomDir(mDefaultMetaball));
 	mMetaballs.push_back(leftMetaball);
 	mBallDir.push_back(getRandomDir(leftMetaball));
+	mGrid.Initialize(0.3);
 }
 
 
@@ -56,7 +57,7 @@ void MetaballFactory::ClearGrid(void)
 void MetaballFactory::UpdatePositions(void)
 {
 	Metaball currBall, otherBall;
-	float distance;
+	float distance = 0;
 	float trackRadius;
 	for (int i = 0; i < mMetaballs.size(); i++)
 	{
@@ -67,9 +68,9 @@ void MetaballFactory::UpdatePositions(void)
 		{
 			otherBall = mMetaballs.at(j);
 			if (currBall.position != otherBall.position && currBall.sRadius != otherBall.sRadius
-				&& (currBall.position - otherBall.position).length < distance)
+				&& (currBall.position - otherBall.position).length() < distance)
 			{
-				distance = (currBall.position - otherBall.position).length;
+				distance = (currBall.position - otherBall.position).length();
 
 				//x
 				//ARC_RADIUS * cos(arc_angle * DEGREES_TO_RADIANS)
@@ -134,7 +135,7 @@ void MetaballFactory::Update(void)
 		for (int j = 0; mGrid.vertices.size(); j++)
 		{
 			currCV = mGrid.vertices.at(j);
-			currCV.surfaceValue = (currCV.position - currBall.position).length;
+			currCV.surfaceValue = (currCV.position - currBall.position).length();
 		}
 		// if the isosurface is too big or too small for the marching cube 
 		// to draw, do not update the positions
