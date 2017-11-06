@@ -27,7 +27,7 @@ Metaball::Metaball(glm::vec3 pos, float rad)
 //        maxNum(7),
         position(pos)
 {
-    sRadius = rad * rad;
+	sRadius = rad;
 }
 
 Metaball::~Metaball()

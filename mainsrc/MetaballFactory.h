@@ -31,7 +31,7 @@ public:
     Metaball                mDefaultMetaball;           // default metaball parameters that we use
     MarchingGrid            mGrid;                      // global grid 
     std::vector<Metaball>   mMetaballs;                 // list of metaballs in the system
-	std::vector<glm::vec3>  mBallDir;                   // list of direciton of metablls, the index matches the index of mMetaballs
+	std::vector<glm::vec3>  mRotaAxis;                   // list of rotating axis of metablls, the index matches the index of mMetaballs
     Triag                   mTriangles;                 // triangles for storing computed polygons
 
 	int startNum;
@@ -39,8 +39,8 @@ public:
 	int maxNum;
                             
 private:
-	glm::vec3               getRandomDir(Metaball ball);// randomly generate a direction for the metaball to go.
     void                    ClearGrid               (void);
     void                    UpdatePositions         (void);
+	glm::vec3               genRandAxis             (void);
    
 };

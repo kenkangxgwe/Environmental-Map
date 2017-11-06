@@ -25,7 +25,11 @@ MetaballFactory::MetaballFactory(void)
 	// store the metaballs in the list and generate a coresponding list
 	// of directions for each metaball to float to.
 	mMetaballs.push_back(mDefaultMetaball);
+	glm::vec3 axisDefault = genRandAxis();
+	mRotaAxis.push_back(axisDefault);
 	mMetaballs.push_back(leftMetaball);
+	glm::vec3 axisLeft = genRandAxis();
+	mRotaAxis.push_back(axisLeft);
 	// the param must be an integer
 	mGrid.Initialize(20);
 }
@@ -58,13 +62,14 @@ void MetaballFactory::UpdatePositions(void)
 	Metaball *currBall, *otherBall;
 	// the axis the metaballs will move around about
 	float angle = 5.0f;   // set the default degrees of moment
-	glm::vec3 centerAxis = glm::vec3(1, 1, 1);
+	glm::vec3 *centerAxis;
 	float distance = 0.0f;
 	float trackRadius = 0.0f;
 	for (int i = 0; i < mMetaballs.size(); i++)
 	{
 		currBall = &mMetaballs[i];
-		trackRadius = glm::length(currBall->position - centerAxis);
+		centerAxis = &mRotaAxis[i];
+		trackRadius = glm::length(currBall->position - *centerAxis);
 		// randomly pick a track for the current moving ball
 		for (int j = 0; j < mMetaballs.size(); j++)
 		{
@@ -76,9 +81,17 @@ void MetaballFactory::UpdatePositions(void)
 		}
 		//update the degree based on the distance between the balls
 		angle /= distance;
+		angle *= 0.1;
 		//x
-		currBall->position = glm::gtx::rotate_vector::rotate(currBall->position, angle, centerAxis);
+		currBall->position = glm::gtx::rotate_vector::rotate(currBall->position, angle, *centerAxis);
 	}
+}
+
+glm::vec3 MetaballFactory::genRandAxis(void)
+{
+	glm::vec3 axis = glm::normalize(glm::vec3(rand() % 10, rand() % 10, rand() % 10));
+
+	return axis;
 }
 
 //=====================================================================
