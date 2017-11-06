@@ -203,13 +203,10 @@ int main()
 	Shader cubeShader("Shaders/environment.vert", "Shaders/environment.frag");
 	GLuint cubeTex = GenerateCubeMap();
 
-	// Orphan Expression
-
 	//game loop, as long as window is open
 	while (!glfwWindowShouldClose(window))
 	{
 		//deltaTime is used to calculate camera movement frame independently
-		metaFact.Update();
 		GLfloat currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -250,17 +247,18 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(ballShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(ballShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform3fv(glGetUniformLocation(ballShader.Program, "cameraPos"), 1, glm::value_ptr(camera.pos));
-		glBindVertexArray(ballVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, ballPosVBO);
-		if (!metaFact.mTriangles.points.size())
-			continue;
-		glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.points[0], GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, ballNormVBO);
-		glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.normals[0], GL_DYNAMIC_DRAW);
-		//glDrawArrays(GL_TRIANGLES, 0 , metaFact.mTriangles.points.size());
-		glDrawArrays(GL_TRIANGLES, 0 , metaFact.mTriangles.points.size());
-		// free the binding
-		glBindVertexArray(0);
+		metaFact.Update();
+		if (metaFact.mTriangles.points.size()) {
+			glBindVertexArray(ballVAO);
+			glBindBuffer(GL_ARRAY_BUFFER, ballPosVBO);
+			glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.points[0], GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, ballNormVBO);
+			glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.normals[0], GL_DYNAMIC_DRAW);
+			//glDrawArrays(GL_TRIANGLES, 0 , metaFact.mTriangles.points.size());
+			glDrawArrays(GL_TRIANGLES, 0, metaFact.mTriangles.points.size());
+			// free the binding
+			glBindVertexArray(0);
+		}
 
 
 		// set up the environment box and draw it

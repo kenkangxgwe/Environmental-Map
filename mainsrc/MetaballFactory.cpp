@@ -57,28 +57,27 @@ void MetaballFactory::ClearGrid(void)
 void MetaballFactory::UpdatePositions(void)
 {
 	Metaball *currBall, *otherBall;
-	float distance = 0;
-	float trackRadius = 0;
-	float angle = 100;   // set the default degrees of moment
+	float distance = 0.0f;
+	float trackRadius = 0.0f;
+	float angle = 5.0f;   // set the default degrees of moment
+	trackRadius = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1 - currBall->sRadius)));
 	for (int i = 0; i < mMetaballs.size(); i++)
 	{
 		currBall = &mMetaballs[i];
 		// randomly pick a track for the current moving ball
-		trackRadius = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1 - currBall->sRadius)));
 		for (int j = 0; j < mMetaballs.size(); j++)
 		{
 			otherBall = &mMetaballs[j];
-			if (currBall->position != otherBall->position && currBall->sRadius != otherBall->sRadius
-				&& (distance == 0 || glm::length(currBall->position - otherBall->position) < distance)) 
+			if (i != j && (distance == 0 || glm::length(currBall->position - otherBall->position) < distance)) 
 			{
 				distance = glm::length(currBall->position - otherBall->position);
-
-				//x
-				currBall->position.x += cos(angle * (1 - distance)) * trackRadius;
-				//y
-				currBall->position.y += sin(angle * (1 - distance)) * trackRadius;
 			}
 		}
+
+		//x
+		currBall->position.x -= cos(angle / distance) * trackRadius;
+		//y
+		currBall->position.y += sin(angle / distance) * trackRadius;
 	}
 }
 
@@ -130,7 +129,6 @@ void MetaballFactory::Update(void)
 		{
 			currCV = &mGrid.vertices[j];
 			currCV->surfaceValue = glm::length(currCV->position - currBall->position);
-			assert(currCV->surfaceValue <= 3.5);
 		}
 		// if the isosurface is too big or too small for the marching cube
 		// to draw, do not update the positions
@@ -142,7 +140,7 @@ void MetaballFactory::Update(void)
 
 		// update the normals for the returned triangle mes
 		// calculate normal by substracting one cube vertex by the position of the metaball,
-	    // only calculate the normal for the grid thats intersected by the ball.
+		// only calculate the normal for the grid thats intersected by the ball.
 		for (int k = startIndex; k < mTriangles.points.size(); k++)
 		{
 			mTriangles.normals.push_back(glm::normalize(mTriangles.points[k] - currBall->position));
