@@ -54,7 +54,7 @@ public:
     int mLevel;
 
 
-    bool Initialize(int size);
+	bool Initialize(float size);
     bool IsosurfaceToPolygons(float level, Triag &triangles);
     std::vector<CubeVert> vertices;
     std::vector<GridCube> cubes;
