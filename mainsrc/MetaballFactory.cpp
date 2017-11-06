@@ -56,8 +56,9 @@ void MetaballFactory::ClearGrid(void)
 void MetaballFactory::UpdatePositions(void)
 {
 	Metaball currBall, otherBall;
-	float distance;
-	float trackRadius;
+	float distance = 0;
+	float trackRadius = 0;
+	float angle = 100;   // set the default degrees of moment 
 	for (int i = 0; i < mMetaballs.size(); i++)
 	{
 		currBall = mMetaballs.at(i);
@@ -67,15 +68,14 @@ void MetaballFactory::UpdatePositions(void)
 		{
 			otherBall = mMetaballs.at(j);
 			if (currBall.position != otherBall.position && currBall.sRadius != otherBall.sRadius
-				&& (currBall.position - otherBall.position).length < distance)
+				 && (currBall.position - otherBall.position).length() < distance)
 			{
-				distance = (currBall.position - otherBall.position).length;
+				distance = (currBall.position - otherBall.position).length();
 
 				//x
-				//ARC_RADIUS * cos(arc_angle * DEGREES_TO_RADIANS)
+				currBall.position.x = currBall.position.x + cos(angle * (1 - distance)) * trackRadius;
 				//y
-				//ARC_RADIUS * sin(arc_angle * DEGREES_TO_RADIANS)
-
+				currBall.position.x = currBall.position.x + sin(angle * (1 - distance)) * trackRadius;
 			}
 		}
 	}
@@ -116,8 +116,7 @@ void MetaballFactory::Update(void)
 	std::vector<GridCube> cubes = mGrid.cubes;
 	Metaball currBall;
 	CubeVert currCV;
-	glm::vec3 currVer;
-	glm::vec3 currNor;
+	glm::vec3 currVer, currNor;
 
 	ClearGrid();
 	// update the metaball postions
@@ -134,7 +133,7 @@ void MetaballFactory::Update(void)
 		for (int j = 0; mGrid.vertices.size(); j++)
 		{
 			currCV = mGrid.vertices.at(j);
-			currCV.surfaceValue = (currCV.position - currBall.position).length;
+			currCV.surfaceValue = (currCV.position - currBall.position).length();
 		}
 		// if the isosurface is too big or too small for the marching cube 
 		// to draw, do not update the positions
