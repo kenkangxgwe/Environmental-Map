@@ -204,12 +204,12 @@ int main()
 	GLuint cubeTex = GenerateCubeMap();
 
 	// Orphan Expression
-	metaFact.Update();
 
 	//game loop, as long as window is open
 	while (!glfwWindowShouldClose(window))
 	{
 		//deltaTime is used to calculate camera movement frame independently
+		metaFact.Update();
 		GLfloat currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -244,7 +244,7 @@ int main()
 		//// free the binding
 		//glBindVertexArray(0);
 
-		// set up the teapot shader and draw the metaballs
+		// set up the shader and draw the metaballs
 		ballShader.Use();
 		glUniformMatrix4fv(glGetUniformLocation(ballShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(ballShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));

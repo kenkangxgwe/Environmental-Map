@@ -69,14 +69,14 @@ void MetaballFactory::UpdatePositions(void)
 		{
 			otherBall = &mMetaballs[j];
 			if (currBall->position != otherBall->position && currBall->sRadius != otherBall->sRadius
-				 && glm::length(currBall->position - otherBall->position) < 2.0*std::sqrt(3.0))
+				&& (distance == 0 || glm::length(currBall->position - otherBall->position) < distance)) 
 			{
 				distance = glm::length(currBall->position - otherBall->position);
 
 				//x
-				currBall->position.x = currBall->position.x - cos(angle * (1 - distance)) * trackRadius;
+				currBall->position.x += cos(angle * (1 - distance)) * trackRadius;
 				//y
-				currBall->position.y = currBall->position.y + sin(angle * (1 - distance)) * trackRadius;
+				currBall->position.y += sin(angle * (1 - distance)) * trackRadius;
 			}
 		}
 	}
@@ -118,17 +118,13 @@ void MetaballFactory::Update(void)
 	CubeVert *currCV;
 
 	ClearGrid();
+
+	//currBall->position += mBallDir[i];
 	UpdatePositions();
 	// update the metaball postions
 	for (int i = 0; i < mMetaballs.size(); i++)
 	{
-		//TODO: update the positions inversely to the propertion of distance
 		currBall = &mMetaballs[i];
-		currBall->position += mBallDir[i];
-
-		// update the distance between each vertex in the marching grid cube
-		// to its center
-
 		// update the gribs vertices accordingly
 		for (int j = 0; j < mGrid.vertices.size(); j++)
 		{
