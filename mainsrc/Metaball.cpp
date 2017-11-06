@@ -14,17 +14,17 @@
 // Initialize Metaball
 //------------------------------------------
 Metaball::Metaball()
-    :       startNum(3),
-            minNum(1),
-            maxNum(7)
+//    :       startNum(3),
+//            minNum(1),
+//            maxNum(7)
 {
 }
 
 
 Metaball::Metaball(glm::vec3 pos, float rad)
-    :	startNum(3),
-        minNum(1),
-        maxNum(7),
+://    :	startNum(3),
+//        minNum(1),
+//        maxNum(7),
         position(pos)
 {
     sRadius = rad * rad;

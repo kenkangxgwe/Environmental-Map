@@ -22,8 +22,8 @@ public:
 
 	glm::vec3 position;
 	float sRadius;
-	int startNum;
-	int minNum;
-	int maxNum;
+//	int startNum;
+//	int minNum;
+//	int maxNum;
 
 };

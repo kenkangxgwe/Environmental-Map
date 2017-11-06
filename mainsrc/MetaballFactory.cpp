@@ -11,9 +11,23 @@
 #include "MetaballFactory.h"
 
 
-
+// I've moved the startNum, minNum and maxNum variables from Metabll class
+// to here, so the balls do not have to know how many of itself are produced.
 MetaballFactory::MetaballFactory(void)
+:       startNum(3),
+        minNum(1),
+        maxNum(7)
 {
+	// set up a few metablls when intializing the factory
+	//TODO: check for max and min limits in the metaball list
+	Metaball leftMetaball = Metaball(glm::vec3(-0.5,0,0), 0.3);
+	mDefaultMetaball = Metaball(glm::vec3(0,0,0), 0.5);
+	// store the metaballs in the list and generate a coresponding list
+	// of directions for each metaball to float to.
+	mMetaballs.push_back(mDefaultMetaball);
+	mBallDir.push_back(getRandomDir(mDefaultMetaball));
+	mMetaballs.push_back(leftMetaball);
+	mBallDir.push_back(getRandomDir(leftMetaball));
 }
 
 
@@ -28,7 +42,8 @@ MetaballFactory::~MetaballFactory(void)
 //================================================================
 void MetaballFactory::ClearGrid(void)
 {
-
+	mTriangles.points.clear();
+	mTriangles.normals.clear();
 }
 
 
@@ -40,11 +55,45 @@ void MetaballFactory::ClearGrid(void)
 //================================================================
 void MetaballFactory::UpdatePositions(void)
 {
+	Metaball currBall, otherBall;
+	float distance;
+	float trackRadius;
+	for (int i = 0; i < mMetaballs.size(); i++)
+	{
+		currBall = mMetaballs.at(i);
+		// randomly pick a track for the current moving ball
+		trackRadius = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1 - currBall.sRadius)));
+		for (int j = 0; mMetaballs.size(); j++)
+		{
+			otherBall = mMetaballs.at(j);
+			if (currBall.position != otherBall.position && currBall.sRadius != otherBall.sRadius
+				&& (currBall.position - otherBall.position).length < distance)
+			{
+				distance = (currBall.position - otherBall.position).length;
 
+				//x
+				//ARC_RADIUS * cos(arc_angle * DEGREES_TO_RADIANS)
+				//y
+				//ARC_RADIUS * sin(arc_angle * DEGREES_TO_RADIANS)
+
+			}
+		}
+	}
 }
 
+//==============================================================
+// TO DO: Project 4 
+// Randomly generate a moving vector for each metaball
+//================================================================
+glm::vec3 MetaballFactory::getRandomDir(Metaball ball)
+{
+	glm::vec3 dir;
+	dir.x = rand() % 1;
+	dir.y = rand() % 1;
+	dir.z = rand() % 1;
 
-
+	return dir;
+}
 
 
 
@@ -64,6 +113,46 @@ void MetaballFactory::UpdatePositions(void)
 //=====================================================================
 void MetaballFactory::Update(void)
 { 
+	std::vector<GridCube> cubes = mGrid.cubes;
+	Metaball currBall;
+	CubeVert currCV;
+	glm::vec3 currVer;
+	glm::vec3 currNor;
 
+	ClearGrid();
+	// update the metaball postions
+	for (int i = 0; i < mMetaballs.size(); i++)
+	{
+		//TODO: update the positions inversely to the propertion of distance
+		currBall = mMetaballs.at(i);
+		currBall.position = currBall.position + mBallDir.at(i);
 
+		// update the distance between each vertex in the marching grid cube 
+		// to its center
+
+		// update the gribs vertices accordingly
+		for (int j = 0; mGrid.vertices.size(); j++)
+		{
+			currCV = mGrid.vertices.at(j);
+			currCV.surfaceValue = (currCV.position - currBall.position).length;
+		}
+		// if the isosurface is too big or too small for the marching cube 
+		// to draw, do not update the positions
+		if (!mGrid.IsosurfaceToPolygons(currBall.sRadius, mTriangles))
+		{
+			return;
+		}
+
+		// update the normals for the returned triangle mes
+		// calculate normal by substracting one cube vertex by the position of the metaball,
+	    // only calculate the normal for the grid thats intersected by the ball.
+		for (int k = 0; k < mTriangles.points.size(); k++)
+		{
+			currVer = mTriangles.points.at(k);
+			currNor = mTriangles.normals.at(k);
+			currNor = glm::normalize(currVer - currBall.position);
+		}
+
+	}
 }
+
