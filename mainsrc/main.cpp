@@ -118,14 +118,35 @@ int main()
 
 	// The teapot
 	// Intialize a instance form Geomotry class to read in the obj file of the teapot
-	Geometry teapot;
-	teapot.Initialize("../../data/models/teapot.obj");
+	//Geometry teapot;
+	//teapot.Initialize("../../data/models/teapot.obj");
 
 	// teapot VAO prep and manipulation
-	GLuint potVAO;
-	glGenVertexArrays(1, &potVAO);
-	//link shaders
-	Shader potShader("Shaders/reflection.vert", "Shaders/reflection.frag");
+	//GLuint potVAO;
+	//glGenVertexArrays(1, &potVAO);
+	////link shaders
+	//Shader potShader("Shaders/reflection.vert", "Shaders/reflection.frag");
+	//// the transform matrix translate from canonical to world view.
+	//glm::mat4 model(glm::mat3(10.0f));
+	//model = glm::translate<float>(model, glm::vec3(0.0f, 0.0f, 0.0f));
+
+	// The metaballs
+	MetaballFactory metaFact;
+	metaFact.Update();
+	GLuint ballVAO, ballPosVBO, ballNormVBO;
+	glGenVertexArrays(1, &ballVAO);
+	glBindVertexArray(ballVAO);
+	glGenBuffers(1, &ballPosVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, ballPosVBO);
+	glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.points[0], GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(8);
+	glBindBuffer(GL_ARRAY_BUFFER, ballNormVBO);
+	glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.normals.size() * sizeof(glm::vec3), &metaFact.mTriangles.normals[0], GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(9);
+
+	Shader ballShader("Shaders/reflection.vert", "Shaders/reflection.frag");
 	// the transform matrix translate from canonical to world view.
 	glm::mat4 model(glm::mat3(10.0f));
 	model = glm::translate<float>(model, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -198,16 +219,28 @@ int main()
 		glm::mat4 fixView = glm::mat4(glm::mat3(view));
 
 		// set up the teapot shader and draw the tea pot
-		potShader.Use();
-		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform3fv(glGetUniformLocation(potShader.Program, "cameraPos"), 1, glm::value_ptr(camera.pos));
-		glBindVertexArray(potVAO);
-		// 8 is passed in as vertices and 9 as normals
-		teapot.Draw(8, 9);
+		//potShader.Use();
+		//glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		//glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		//glUniformMatrix4fv(glGetUniformLocation(potShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		//glUniform3fv(glGetUniformLocation(potShader.Program, "cameraPos"), 1, glm::value_ptr(camera.pos));
+		//glBindVertexArray(potVAO);
+		//// 8 is passed in as vertices and 9 as normals
+		//teapot.Draw(8, 9);
+		//// free the binding
+		//glBindVertexArray(0);
+
+		// set up the teapot shader and draw the metaballs
+		ballShader.Use();
+		glUniformMatrix4fv(glGetUniformLocation(ballShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(glGetUniformLocation(ballShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(ballShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniform3fv(glGetUniformLocation(ballShader.Program, "cameraPos"), 1, glm::value_ptr(camera.pos));
+		glBindVertexArray(ballVAO);
+		glDrawArrays(GL_TRIANGLES, 0 , metaFact.mTriangles.points.size());
 		// free the binding
 		glBindVertexArray(0);
+
 
 		// set up the environment box and draw it
 		glDepthFunc(GL_LEQUAL);
