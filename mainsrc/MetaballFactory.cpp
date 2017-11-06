@@ -38,7 +38,7 @@ MetaballFactory::~MetaballFactory(void)
 
 
 //==============================================================
-// TO DO: Project 4 
+// TO DO: Project 4
 // clear the surface and normal information in the grid
 //================================================================
 void MetaballFactory::ClearGrid(void)
@@ -50,7 +50,7 @@ void MetaballFactory::ClearGrid(void)
 
 
 //==============================================================
-// TO DO: Project 4 
+// TO DO: Project 4
 // Move positions in a circle as a function of time
 // The rate of motion is inversely proportional to distance (far means slower)
 //================================================================
@@ -58,7 +58,8 @@ void MetaballFactory::UpdatePositions(void)
 {
 	Metaball currBall, otherBall;
 	float distance = 0;
-	float trackRadius;
+	float trackRadius = 0;
+	float angle = 100;   // set the default degrees of moment
 	for (int i = 0; i < mMetaballs.size(); i++)
 	{
 		currBall = mMetaballs.at(i);
@@ -68,22 +69,21 @@ void MetaballFactory::UpdatePositions(void)
 		{
 			otherBall = mMetaballs.at(j);
 			if (currBall.position != otherBall.position && currBall.sRadius != otherBall.sRadius
-				&& (currBall.position - otherBall.position).length() < distance)
+				 && (currBall.position - otherBall.position).length() < distance)
 			{
 				distance = (currBall.position - otherBall.position).length();
 
 				//x
-				//ARC_RADIUS * cos(arc_angle * DEGREES_TO_RADIANS)
+				currBall.position.x = currBall.position.x + cos(angle * (1 - distance)) * trackRadius;
 				//y
-				//ARC_RADIUS * sin(arc_angle * DEGREES_TO_RADIANS)
-
+				currBall.position.x = currBall.position.x + sin(angle * (1 - distance)) * trackRadius;
 			}
 		}
 	}
 }
 
 //==============================================================
-// TO DO: Project 4 
+// TO DO: Project 4
 // Randomly generate a moving vector for each metaball
 //================================================================
 glm::vec3 MetaballFactory::getRandomDir(Metaball ball)
@@ -105,7 +105,7 @@ glm::vec3 MetaballFactory::getRandomDir(Metaball ball)
 // Binds new polygons to the triangle object
 // 1. - Remember to clear the surface and normal information in the grid
 // 2. - Move the positions of the metaballs circularly as a function of time
-//    
+//
 // 3.- For each metaball and each grid vertex, compute and update the following...
 //      -the metaball point - a vector from the metaball to the grid index
 //      -normals
@@ -113,12 +113,11 @@ glm::vec3 MetaballFactory::getRandomDir(Metaball ball)
 // 4. Convert the isosurface to polygons MarchingGrid::IsosurfaceToPolygon
 //=====================================================================
 void MetaballFactory::Update(void)
-{ 
+{
 	std::vector<GridCube> cubes = mGrid.cubes;
 	Metaball currBall;
 	CubeVert currCV;
-	glm::vec3 currVer;
-	glm::vec3 currNor;
+	glm::vec3 currVer, currNor;
 
 	ClearGrid();
 	// update the metaball postions
@@ -128,7 +127,7 @@ void MetaballFactory::Update(void)
 		currBall = mMetaballs.at(i);
 		currBall.position = currBall.position + mBallDir.at(i);
 
-		// update the distance between each vertex in the marching grid cube 
+		// update the distance between each vertex in the marching grid cube
 		// to its center
 
 		// update the gribs vertices accordingly
@@ -137,7 +136,7 @@ void MetaballFactory::Update(void)
 			currCV = mGrid.vertices.at(j);
 			currCV.surfaceValue = (currCV.position - currBall.position).length();
 		}
-		// if the isosurface is too big or too small for the marching cube 
+		// if the isosurface is too big or too small for the marching cube
 		// to draw, do not update the positions
 		if (!mGrid.IsosurfaceToPolygons(currBall.sRadius, mTriangles))
 		{
@@ -156,4 +155,3 @@ void MetaballFactory::Update(void)
 
 	}
 }
-
