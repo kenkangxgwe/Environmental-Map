@@ -27,7 +27,7 @@ MetaballFactory::MetaballFactory(void)
 	mMetaballs.push_back(mDefaultMetaball);
 	mMetaballs.push_back(leftMetaball);
 	// the param must be an integer
-	mGrid.Initialize(5);
+	mGrid.Initialize(20);
 }
 
 
@@ -58,7 +58,7 @@ void MetaballFactory::UpdatePositions(void)
 	Metaball *currBall, *otherBall;
 	// the axis the metaballs will move around about
 	float angle = 5.0f;   // set the default degrees of moment
-	glm::vec3 centerAxis = glm::vec3(0, 1, 0);
+	glm::vec3 centerAxis = glm::vec3(1, 1, 1);
 	float distance = 0.0f;
 	float trackRadius = 0.0f;
 	for (int i = 0; i < mMetaballs.size(); i++)
@@ -74,8 +74,10 @@ void MetaballFactory::UpdatePositions(void)
 				distance = glm::length(currBall->position - otherBall->position);
 			}
 		}
+		//update the degree based on the distance between the balls
+		angle /= distance;
 		//x
-		glm::gtx::rotate_vector::rotate(currBall->position, angle, centerAxis);
+		currBall->position = glm::gtx::rotate_vector::rotate(currBall->position, angle, centerAxis);
 	}
 }
 
