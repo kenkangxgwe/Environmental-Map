@@ -308,22 +308,26 @@ void KeyCallback(GLFWwindow *window, int key, int scan, int act, int mode)
 
 	if (key == GLFW_KEY_UP && act == GLFW_PRESS)
 	{
-		ballFactory.mGrid.Initialize(ballFactory.mGrid.mGridSize + ballFactory.mGrid.mLevel);
+		ballFactory.mGrid.Initialize(ballFactory.mGrid.mGridSize + 2);
 	}
 
 	if (key == GLFW_KEY_DOWN && act == GLFW_PRESS)
 	{
-		ballFactory.mGrid.Initialize(ballFactory.mGrid.mGridSize - ballFactory.mGrid.mLevel);
+		ballFactory.mGrid.Initialize(ballFactory.mGrid.mGridSize - 2);
 	}
 
 	if (key == GLFW_KEY_LEFT && act == GLFW_PRESS)
 	{
 		//ballFactory.AddBall();
+		ballFactory.mGrid.mLevel -= 0.05;
+		std::cout << "mLevel = " << ballFactory.mGrid.mLevel << std::endl;
 	}
 
 	if (key == GLFW_KEY_RIGHT && act == GLFW_PRESS)
 	{
 		//ballFactory.DeleteBall();
+		ballFactory.mGrid.mLevel += 0.05;
+		std::cout << "mLevel = " << ballFactory.mGrid.mLevel << std::endl;
 	}
 	//updating keys table
 	if (act == GLFW_PRESS)

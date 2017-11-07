@@ -51,7 +51,7 @@ public:
     int mMinSize;
     int mMaxSize;
     int mGridSize;
-    int mLevel;
+    float mLevel;
 
 	bool Initialize(int size);
     bool IsosurfaceToPolygons(float level, Triag &triangles);

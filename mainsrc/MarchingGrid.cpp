@@ -13,7 +13,7 @@ MarchingGrid::MarchingGrid()
     : mMinSize  (5),
       mMaxSize  (100),
       mGridSize (10),
-      mLevel    (5)
+      mLevel    (1.0f)
 
 {
 
@@ -101,6 +101,7 @@ bool MarchingGrid::Initialize(int size)
 //---------------------------------------------------------------------------------
 bool MarchingGrid::IsosurfaceToPolygons(float level, Triag &triangles)
 {
+	level = mLevel;
 	for (auto &cube : cubes) {
 		int edgeIndex = 0;
 		for (int i = 7; i >= 0; i--) {
