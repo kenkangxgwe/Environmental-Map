@@ -49,12 +49,11 @@ public:
     ~MarchingGrid();
 
     int mMinSize;
-    int mMaxsize;
+    int mMaxSize;
     int mGridSize;
     int mLevel;
 
-
-	bool Initialize(float size);
+	bool Initialize(int size);
     bool IsosurfaceToPolygons(float level, Triag &triangles);
     std::vector<CubeVert> vertices;
     std::vector<GridCube> cubes;

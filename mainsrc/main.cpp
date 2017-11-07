@@ -60,6 +60,9 @@ Camera camera(glm::vec3(0.0f, 0.0f, 20.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f,
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
+// MetaBall Factory
+MetaballFactory ballFactory;
+
 //----------------------------------------------------
 // Main entry point
 // DONE - Manage all OpenGL draw calls here
@@ -131,18 +134,17 @@ int main()
 	//model = glm::translate<float>(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// The metaballs
-	MetaballFactory metaFact;
 	GLuint ballVAO, ballVBO;
 	GLuint ballPosVBO, ballNormVBO;
 	glGenVertexArrays(1, &ballVAO);
 	glBindVertexArray(ballVAO);
 	//glGenBuffers(1, &ballVBO);
 	//glBindBuffer(GL_ARRAY_BUFFER, ballVBO);
-	//glBufferSubData(GL_ARRAY_BUFFER, 0, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.points[0]);
-	//glBufferSubData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), metaFact.mTriangles.normals.size() * sizeof(glm::vec3), &metaFact.mTriangles.normals[0]);
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, ballFactory.mTriangles.points.size() * sizeof(glm::vec3), &ballFactory.mTriangles.points[0]);
+	//glBufferSubData(GL_ARRAY_BUFFER, ballFactory.mTriangles.points.size() * sizeof(glm::vec3), ballFactory.mTriangles.normals.size() * sizeof(glm::vec3), &ballFactory.mTriangles.normals[0]);
 	//glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	//glEnableVertexAttribArray(8);
-	//glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(metaFact.mTriangles.points.size() * sizeof(glm::vec3)));
+	//glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(ballFactory.mTriangles.points.size() * sizeof(glm::vec3)));
 	//glEnableVertexAttribArray(9);
 
 	//std::vector<glm::vec3> test;
@@ -160,7 +162,7 @@ int main()
 
 	Shader ballShader("Shaders/reflection.vert", "Shaders/reflection.frag");
 	// the transform matrix translate from canonical to world view.
-	glm::mat4 model(glm::mat3(50.0f));
+	glm::mat4 model(glm::mat3(10.0f));
 	model = glm::translate<float>(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// The vertex indices of the sky box
@@ -247,15 +249,15 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(ballShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(ballShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniform3fv(glGetUniformLocation(ballShader.Program, "cameraPos"), 1, glm::value_ptr(camera.pos));
-		metaFact.Update();
-		if (metaFact.mTriangles.points.size()) {
+		ballFactory.Update();
+		if (ballFactory.mTriangles.points.size()) {
 			glBindVertexArray(ballVAO);
 			glBindBuffer(GL_ARRAY_BUFFER, ballPosVBO);
-			glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.points[0], GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, ballFactory.mTriangles.points.size() * sizeof(glm::vec3), &ballFactory.mTriangles.points[0], GL_DYNAMIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, ballNormVBO);
-			glBufferData(GL_ARRAY_BUFFER, metaFact.mTriangles.points.size() * sizeof(glm::vec3), &metaFact.mTriangles.normals[0], GL_DYNAMIC_DRAW);
-			//glDrawArrays(GL_TRIANGLES, 0 , metaFact.mTriangles.points.size());
-			glDrawArrays(GL_TRIANGLES, 0, metaFact.mTriangles.points.size());
+			glBufferData(GL_ARRAY_BUFFER, ballFactory.mTriangles.points.size() * sizeof(glm::vec3), &ballFactory.mTriangles.normals[0], GL_DYNAMIC_DRAW);
+			//glDrawArrays(GL_TRIANGLES, 0 , ballFactory.mTriangles.points.size());
+			glDrawArrays(GL_TRIANGLES, 0, ballFactory.mTriangles.points.size());
 			// free the binding
 			glBindVertexArray(0);
 		}
@@ -283,6 +285,8 @@ int main()
 
 	//glDeleteVertexArrays(1, &potVAO);
 	glDeleteVertexArrays(1, &ballVAO);
+	glDeleteBuffers(1, &ballPosVBO);
+	glDeleteBuffers(1, &ballNormVBO);
 	glDeleteVertexArrays(1, &cubeVAO);
 	glDeleteBuffers(1, &cubeVBO);
 
@@ -304,22 +308,22 @@ void KeyCallback(GLFWwindow *window, int key, int scan, int act, int mode)
 
 	if (key == GLFW_KEY_UP && act == GLFW_PRESS)
 	{
-		camera.pitch += 10.0f;
+		ballFactory.mGrid.Initialize(ballFactory.mGrid.mGridSize + ballFactory.mGrid.mLevel);
 	}
 
 	if (key == GLFW_KEY_DOWN && act == GLFW_PRESS)
 	{
-		camera.pitch -= 10.0f;
+		ballFactory.mGrid.Initialize(ballFactory.mGrid.mGridSize - ballFactory.mGrid.mLevel);
 	}
 
 	if (key == GLFW_KEY_LEFT && act == GLFW_PRESS)
 	{
-		camera.yaw -= 10.0f;
+		//ballFactory.AddBall();
 	}
 
 	if (key == GLFW_KEY_RIGHT && act == GLFW_PRESS)
 	{
-		camera.yaw += 10.0f;
+		//ballFactory.DeleteBall();
 	}
 	//updating keys table
 	if (act == GLFW_PRESS)

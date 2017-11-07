@@ -10,10 +10,10 @@
 
 
 MarchingGrid::MarchingGrid()
-    : mMinSize  (10),
-      mMaxsize  (100),
-      mGridSize (30),
-      mLevel    (1.0f)
+    : mMinSize  (5),
+      mMaxSize  (100),
+      mGridSize (10),
+      mLevel    (5)
 
 {
 
@@ -33,20 +33,30 @@ MarchingGrid::~MarchingGrid()
 // and the grid size.
 // There are 8 vertices for each cube.
 //----------------------------------------------------
-bool MarchingGrid::Initialize(float size)
+bool MarchingGrid::Initialize(int size)
 {
-	mGridSize = 15 / size + 1;
-	float cellSize = 2.0 / mGridSize;
+	if (size > mMaxSize) {
+		mGridSize = mMaxSize;
+	}
+	else if (size < mMinSize) {
+		mGridSize = mMinSize;
+	}
+	else {
+		mGridSize = size;
+	}
+	std::cout << "mGridSize = " << mGridSize << std::endl;
+	vertices.clear();
 	vertices.reserve((mGridSize + 1)*(mGridSize + 1)*(mGridSize + 1));
 	for (int i = 0; i <= mGridSize; i++) {
 		for (int j = 0; j <= mGridSize; j++) {
 			for (int k = 0; k <= mGridSize; k++) {
 				CubeVert newVert;
-				newVert.position = glm::vec3(k, i, j) * float(cellSize) - glm::vec3(1.0f, 1.0f, 1.0f);
+				newVert.position = glm::vec3(k, i, j) * float(2.0 / mGridSize) - glm::vec3(1.0f, 1.0f, 1.0f);
 				vertices.push_back(newVert);
 			}
 		}
 	}
+	cubes.clear();
 	cubes.reserve(mGridSize*mGridSize*mGridSize);
 	for (int i = 0; i < mGridSize*mGridSize*mGridSize; i++) {
 		int offset = i / (mGridSize + 1);
@@ -95,10 +105,12 @@ bool MarchingGrid::IsosurfaceToPolygons(float level, Triag &triangles)
 		int edgeIndex = 0;
 		for (int i = 7; i >= 0; i--) {
 			edgeIndex <<= 1;
-			edgeIndex |= (cube.cVertices[i]->surfaceValue < level);
+			edgeIndex |= (cube.cVertices[i]->surfaceValue <= level);
 		}
 		int edgeList = edgeTable[edgeIndex];
-		std::vector<glm::vec3> edgeVert(12);
+		std::vector<EdgeVert> edgeVert;
+		edgeVert.reserve(12);
+#pragma loop(hint_parallel(8))  
 		for (int i = 0; i < 12; i++) {
 			if (edgeList & 1) {
 				float v1 = cube.cVertices[cubeEdgeVerts[2 * i]]->surfaceValue;
@@ -106,8 +118,13 @@ bool MarchingGrid::IsosurfaceToPolygons(float level, Triag &triangles)
 				assert((v1 - level) * (v2 - level) <= 0);
 				glm::vec3 p1 = cube.cVertices[cubeEdgeVerts[2 * i]]->position;
 				glm::vec3 p2 = cube.cVertices[cubeEdgeVerts[2 * i + 1]]->position;
-				glm::vec3 intersection = p2 + (v2 - level) / (v2 - v1) * (p1 - p2);
-				edgeVert[i] = intersection;
+				glm::vec3 n1 = cube.cVertices[cubeEdgeVerts[2 * i]]->normal;
+				glm::vec3 n2 = cube.cVertices[cubeEdgeVerts[2 * i + 1]]->normal;
+				EdgeVert newEdge;
+				float ratio = (v2 - level) / (v2 - v1);
+				newEdge.position = p2 + ratio * (p1 - p2);
+				newEdge.normal = n2 + ratio * (n1 - n2);
+				edgeVert.push_back(newEdge);
 			}
 			edgeList >>= 1;
 		}
@@ -115,7 +132,8 @@ bool MarchingGrid::IsosurfaceToPolygons(float level, Triag &triangles)
 		for (int i = 0; i < 16; i++) {
 			if (triList[i] == -1)
 				break;
-			triangles.points.push_back(edgeVert[triList[i]]);
+			triangles.points.push_back(edgeVert[triList[i]].position);
+			triangles.normals.push_back(edgeVert[triList[i]].normal);
 		}
 	}
 
