@@ -118,9 +118,7 @@ void MetaballFactory::Update(void)
 		{
 			currCV = &mGrid.vertices[j];
 			// calculate the surface value for each cubevertex
-			currCV->surfaceValue = (pow((currCV->position.x - currBall->position.x),2) +
-								   pow((currCV->position.y - currBall->position.y),2 +
-								   pow((currCV->position.z - currBall->position.z),2)))/ (pow(currBall->sRadius,2));
+			currCV->surfaceValue = (glm::gtx::norm::distance2(currCV->position, currBall->position))/ (pow(currBall->sRadius,2));
 			// calculate normal for each cubevertex
 			currCV->normal = (2.0f * (currCV->position - currBall->position))/ (pow(currBall->sRadius, 2));
 		}

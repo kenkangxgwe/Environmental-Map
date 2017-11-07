@@ -14,6 +14,7 @@
 #include "MarchingGrid.h"
 #include "Metaball.h"
 #include <gtx/rotate_vector.hpp>
+#include <gtx/norm.hpp>
 #include <stdlib.h>     /* srand, rand */
 
 
