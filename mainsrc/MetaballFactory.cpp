@@ -19,17 +19,9 @@ MetaballFactory::MetaballFactory(void)
         maxNum(7)
 {
 	// set up a few metablls when intializing the factory
-	//TODO: check for max and min limits in the metaball list
-	Metaball leftMetaball = Metaball(glm::vec3(-0.2,0,0), 0.3);
-	mDefaultMetaball = Metaball(glm::vec3(0.2,0,0), 0.5);
-	// store the metaballs in the list and generate a coresponding list
-	// of directions for each metaball to float to.
-	mMetaballs.push_back(mDefaultMetaball);
-	glm::vec3 axisDefault = genRandAxis();
-	mRotaAxis.push_back(axisDefault);
-	mMetaballs.push_back(leftMetaball);
-	glm::vec3 axisLeft = genRandAxis();
-	mRotaAxis.push_back(axisLeft);
+	addBall(glm::vec3(-0.2, 0, 0), 0.3);
+	addBall(glm::vec3(0.2, 0,0), 0.5);
+	
 	// the param must be an integer
 	mGrid.Initialize(20);
 }
@@ -125,23 +117,38 @@ void MetaballFactory::Update(void)
 		for (int j = 0; j < mGrid.vertices.size(); j++)
 		{
 			currCV = &mGrid.vertices[j];
-			currCV->surfaceValue = glm::length(currCV->position - currBall->position);
+			// calculate the surface value for each cubevertex
+			currCV->surfaceValue = (pow((currCV->position.x - currBall->position.x),2) +
+								   pow((currCV->position.y - currBall->position.y),2 +
+								   pow((currCV->position.z - currBall->position.z),2)))/ (pow(currBall->sRadius,2));
+			// calculate normal for each cubevertex
+			currCV->normal = (2.0f * (currCV->position - currBall->position))/ (pow(currBall->sRadius, 2));
 		}
 		// if the isosurface is too big or too small for the marching cube
 		// to draw, do not update the positions
 		int startIndex = mTriangles.points.size();
-		if (!mGrid.IsosurfaceToPolygons(currBall->sRadius, mTriangles))
+		// the level passed in is the force field influence level
+		// TODO: change it from 1 to actual value
+		if (!mGrid.IsosurfaceToPolygons(1, mTriangles))
 		{
 			return;
 		}
-
-		// update the normals for the returned triangle mes
-		// calculate normal by substracting one cube vertex by the position of the metaball,
-		// only calculate the normal for the grid thats intersected by the ball.
-		for (int k = startIndex; k < mTriangles.points.size(); k++)
-		{
-			mTriangles.normals.push_back(glm::normalize(mTriangles.points[k] - currBall->position));
-		}
-
 	}
+}
+
+void MetaballFactory::addBall(glm::vec3 pos, float radius)
+{
+	// generate the ball and give it a randomized axis
+	mMetaballs.push_back(Metaball(pos, radius));
+	if (mMetaballs.size() >= maxNum)
+	{
+		deleteBall();
+		throw("Cannot excede maximum ball number");
+	}
+	mRotaAxis.push_back(genRandAxis());
+}
+
+void MetaballFactory::deleteBall(void)
+{
+	mMetaballs.pop_back();
 }

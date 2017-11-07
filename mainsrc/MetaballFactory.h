@@ -13,7 +13,7 @@
 
 #include "MarchingGrid.h"
 #include "Metaball.h"
-#include <glm/gtx/rotate_vector.hpp>
+#include <gtx/rotate_vector.hpp>
 #include <stdlib.h>     /* srand, rand */
 
 
@@ -27,7 +27,8 @@ public:
 
 
     void                    Update                      (void);
-
+	void                    addBall                     (glm::vec3, float raidus); // add a ball to the scene
+	void					deleteBall                  (void); // delete last added ball from the scene
     Metaball                mDefaultMetaball;           // default metaball parameters that we use
     MarchingGrid            mGrid;                      // global grid 
     std::vector<Metaball>   mMetaballs;                 // list of metaballs in the system
