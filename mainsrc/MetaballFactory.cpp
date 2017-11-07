@@ -19,8 +19,8 @@ MetaballFactory::MetaballFactory(void)
         maxNum(7)
 {
 	// set up a few metablls when intializing the factory
-	addBall(glm::vec3(-0.2, 0, 0), 0.3);
-	addBall(glm::vec3(0.2, 0,0), 0.5);
+	addBall(glm::vec3(-0.2, -0.2, -0.2), 0.3);
+	addBall(glm::vec3(0.2, 0.2,0.2), 0.3);
 	
 	// the param must be an integer
 	mGrid.Initialize(20);
@@ -38,6 +38,10 @@ MetaballFactory::~MetaballFactory(void)
 //================================================================
 void MetaballFactory::ClearGrid(void)
 {
+	for (auto & vertex : mGrid.vertices) {
+		vertex.normal = glm::vec3(0);
+		vertex.surfaceValue = 0;
+	}
 	mTriangles.points.clear();
 	mTriangles.normals.clear();
 }
@@ -55,7 +59,7 @@ void MetaballFactory::UpdatePositions(void)
 	// the axis the metaballs will move around about
 	float angle = 5.0f;   // set the default degrees of moment
 	glm::vec3 *centerAxis;
-	float distance = 0.0f;
+	float distance = 3.0f;
 	float trackRadius = 0.0f;
 	for (int i = 0; i < mMetaballs.size(); i++)
 	{
@@ -118,31 +122,27 @@ void MetaballFactory::Update(void)
 		{
 			currCV = &mGrid.vertices[j];
 			// calculate the surface value for each cubevertex
-			currCV->surfaceValue = (glm::gtx::norm::distance2(currCV->position, currBall->position))/ (pow(currBall->sRadius,2));
+			currCV->surfaceValue += (pow(currBall->sRadius, 2)) / (glm::gtx::norm::distance2(currCV->position, currBall->position));
 			// calculate normal for each cubevertex
-			currCV->normal = (2.0f * (currCV->position - currBall->position))/ (pow(currBall->sRadius, 2));
+			currCV->normal += (2.0f * pow(currBall->sRadius, 2) / pow(glm::gtx::norm::distance2(currCV->position, currBall->position), 2)) * (currCV->position - currBall->position);
 		}
-		// if the isosurface is too big or too small for the marching cube
-		// to draw, do not update the positions
-		int startIndex = mTriangles.points.size();
-		// the level passed in is the force field influence level
-		// TODO: change it from 1 to actual value
-		if (!mGrid.IsosurfaceToPolygons(1, mTriangles))
-		{
-			return;
-		}
+	}
+	// if the isosurface is too big or too small for the marching cube
+	// to draw, do not update the positions
+	if (!mGrid.IsosurfaceToPolygons(1, mTriangles))
+	{
+		return;
 	}
 }
 
 void MetaballFactory::addBall(glm::vec3 pos, float radius)
 {
 	// generate the ball and give it a randomized axis
-	mMetaballs.push_back(Metaball(pos, radius));
 	if (mMetaballs.size() >= maxNum)
 	{
-		deleteBall();
 		throw("Cannot excede maximum ball number");
 	}
+	mMetaballs.push_back(Metaball(pos, radius));
 	mRotaAxis.push_back(genRandAxis());
 }
 

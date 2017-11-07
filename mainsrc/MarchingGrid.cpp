@@ -109,7 +109,7 @@ bool MarchingGrid::IsosurfaceToPolygons(float level, Triag &triangles)
 		}
 		int edgeList = edgeTable[edgeIndex];
 		std::vector<EdgeVert> edgeVert;
-		edgeVert.reserve(12);
+		edgeVert.insert(edgeVert.begin(), 12, EdgeVert());
 #pragma loop(hint_parallel(8))  
 		for (int i = 0; i < 12; i++) {
 			if (edgeList & 1) {
@@ -124,7 +124,7 @@ bool MarchingGrid::IsosurfaceToPolygons(float level, Triag &triangles)
 				float ratio = (v2 - level) / (v2 - v1);
 				newEdge.position = p2 + ratio * (p1 - p2);
 				newEdge.normal = n2 + ratio * (n1 - n2);
-				edgeVert.push_back(newEdge);
+				edgeVert[i] = newEdge;
 			}
 			edgeList >>= 1;
 		}
