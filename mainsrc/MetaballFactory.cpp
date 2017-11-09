@@ -170,7 +170,7 @@ void MetaballFactory::addBall()
 }
 void MetaballFactory::deleteBall(void)
 {
-	if (mMetaballs.size() == minNum)
+	if (!(mMetaballs.size() == minNum))
 	{
 		mMetaballs.pop_back();
 	}
