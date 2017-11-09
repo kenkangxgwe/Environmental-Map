@@ -156,25 +156,22 @@ void MetaballFactory::addBall()
 {
 
 	// generate the ball and give it a randomized axis and position
-	if (mMetaballs.size() + 1 >= maxNum)
+	if (!(mMetaballs.size() == maxNum))
 	{
-		throw("error");
+		mMetaballs.push_back(Metaball(
+				glm::vec3(genRandFloat(-0.6,0.6), genRandFloat(-0.6,0.6), genRandFloat(-0.6,0.6)),
+				genRandFloat(0,0.3)));
+		// print out ball info 
+		mRotaAxis.push_back(genRandAxis());
+		std::cout << "Ball positon: " << mMetaballs[mMetaballs.size() - 1].position.x << ", " << mMetaballs[mMetaballs.size() - 1].position.y
+			<< ", " << mMetaballs[mMetaballs.size() - 1].position.z << " | Ball Radius: " << mMetaballs[mMetaballs.size() - 1].sRadius << std::endl;
 	}
 
-	mMetaballs.push_back(Metaball(
-			glm::vec3(genRandFloat(-0.6,0.6), genRandFloat(-0.6,0.6), genRandFloat(-0.6,0.6)),
-		    genRandFloat(0,0.3)));
-	// print out ball info 
-	mRotaAxis.push_back(genRandAxis());
-	std::cout << "Ball positon: " << mMetaballs[mMetaballs.size() - 1].position.x << ", " << mMetaballs[mMetaballs.size() - 1].position.y
-		<< ", " << mMetaballs[mMetaballs.size() - 1].position.z << " | Ball Radius: " << mMetaballs[mMetaballs.size() - 1].sRadius << std::endl;
 }
 void MetaballFactory::deleteBall(void)
 {
-	if (mMetaballs.size() - 1 <= minNum)
+	if (mMetaballs.size() == minNum)
 	{
-		throw("error");
+		mMetaballs.pop_back();
 	}
-
-	mMetaballs.pop_back();
 }
