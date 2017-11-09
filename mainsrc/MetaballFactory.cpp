@@ -19,9 +19,10 @@ MetaballFactory::MetaballFactory(void)
         maxNum(7)
 {
 	// set up a few metablls when intializing the factory
-	addBall(glm::vec3(-0.2, -0.2, -0.2), 0.3);
-	addBall(glm::vec3(0.2, 0.2,0.2), 0.3);
-	
+	addBall(glm::vec3(-0.2, -0.4, -0.2), 0.3);
+	addBall(glm::vec3(0.2, 0.3,0.2), 0.3);
+	addBall(glm::vec3(0.0, 0.5, -0.5), 0.2);
+
 	// the param must be an integer
 	mGrid.Initialize(20);
 }
@@ -77,7 +78,7 @@ void MetaballFactory::UpdatePositions(void)
 		}
 		//update the degree based on the distance between the balls
 		angle /= distance;
-		angle *= 0.1;
+		angle *= 0.4;
 		//x
 		currBall->position = glm::gtx::rotate_vector::rotate(currBall->position, angle, *centerAxis);
 	}
@@ -90,6 +91,10 @@ glm::vec3 MetaballFactory::genRandAxis(void)
 	return axis;
 }
 
+float MetaballFactory::genRandFloat(float LO, float HI)
+{
+	 return LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
+}
 //=====================================================================
 // TO DO:Project 4
 // Updates locations
@@ -140,13 +145,36 @@ void MetaballFactory::addBall(glm::vec3 pos, float radius)
 	// generate the ball and give it a randomized axis
 	if (mMetaballs.size() >= maxNum)
 	{
-		throw("Cannot excede maximum ball number");
+		throw("Cannot exceed 7 balls.");
 	}
+	
 	mMetaballs.push_back(Metaball(pos, radius));
 	mRotaAxis.push_back(genRandAxis());
 }
 
+void MetaballFactory::addBall()
+{
+
+	// generate the ball and give it a randomized axis and position
+	if (mMetaballs.size() + 1 >= maxNum)
+	{
+		throw("error");
+	}
+
+	mMetaballs.push_back(Metaball(
+			glm::vec3(genRandFloat(-0.6,0.6), genRandFloat(-0.6,0.6), genRandFloat(-0.6,0.6)),
+		    genRandFloat(0,0.3)));
+	// print out ball info 
+	mRotaAxis.push_back(genRandAxis());
+	std::cout << "Ball positon: " << mMetaballs[mMetaballs.size() - 1].position.x << ", " << mMetaballs[mMetaballs.size() - 1].position.y
+		<< ", " << mMetaballs[mMetaballs.size() - 1].position.z << " | Ball Radius: " << mMetaballs[mMetaballs.size() - 1].sRadius << std::endl;
+}
 void MetaballFactory::deleteBall(void)
 {
+	if (mMetaballs.size() - 1 <= minNum)
+	{
+		throw("error");
+	}
+
 	mMetaballs.pop_back();
 }

@@ -28,7 +28,7 @@ public:
 
 
     void                    Update                      (void);
-	void                    addBall                     (glm::vec3, float raidus); // add a ball to the scene
+	void                    addBall                     (void); // add a ball to the scene with randomized position
 	void					deleteBall                  (void); // delete last added ball from the scene
     Metaball                mDefaultMetaball;           // default metaball parameters that we use
     MarchingGrid            mGrid;                      // global grid 
@@ -44,5 +44,7 @@ private:
     void                    ClearGrid               (void);
     void                    UpdatePositions         (void);
 	glm::vec3               genRandAxis             (void);
+	float                   genRandFloat            (float LO, float HI); // randomly generate a number between LO and HI 
+	void					addBall					(glm::vec3, float radius); // the private function adds a ball with specific position
    
 };

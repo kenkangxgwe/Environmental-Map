@@ -325,10 +325,34 @@ void KeyCallback(GLFWwindow *window, int key, int scan, int act, int mode)
 
 	if (key == GLFW_KEY_RIGHT && act == GLFW_PRESS)
 	{
-		//ballFactory.DeleteBall();
 		ballFactory.mGrid.mLevel += 0.05;
 		std::cout << "mLevel = " << ballFactory.mGrid.mLevel << std::endl;
 	}
+
+	if (key == GLFW_KEY_9 && act == GLFW_PRESS)
+	{
+		try
+		{
+			ballFactory.addBall();
+		}
+		catch(std::exception)
+		{
+			std::cout << "Cannot add more than " << ballFactory.maxNum << " balls.";
+		}
+	}
+
+	if (key == GLFW_KEY_0 && act == GLFW_PRESS)
+	{
+		try
+		{
+			ballFactory.deleteBall();
+		}
+		catch (std::exception)
+		{
+			std::cout << "Cannot have less than " << ballFactory.minNum << " balls.";
+		}
+	}
+
 	//updating keys table
 	if (act == GLFW_PRESS)
 		keys[key] = true;
