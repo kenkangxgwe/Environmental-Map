@@ -36,6 +36,7 @@ void KeyMovement(void);
 bool keys[1024];
 GLfloat lastX = windowLength / 2, lastY = windowHeight / 2;
 bool firstMouse = true;
+bool recording = false;
 
 //----------------------------------------------
 // cube maps
@@ -205,6 +206,8 @@ int main()
 	Shader cubeShader("Shaders/environment.vert", "Shaders/environment.frag");
 	GLuint cubeTex = GenerateCubeMap();
 
+	int recordFrameNum = 1;
+
 	//game loop, as long as window is open
 	while (!glfwWindowShouldClose(window))
 	{
@@ -276,6 +279,16 @@ int main()
 		glfwPollEvents();
 		KeyMovement();
 
+		if (recording) {
+			char fileName[100] = "../../data/screenshots/sequence/isosurface_";
+			char fileNum[20];
+			sprintf_s(fileNum, "%06d", recordFrameNum);
+			strcat_s(fileName, fileNum);
+			strcat_s(fileName, ".bmp");
+			SOIL_save_screenshot(fileName, SOIL_SAVE_TYPE_BMP, 0, 0, windowLength, windowHeight);
+			recordFrameNum++;
+		}
+
 		// reset
 		glDepthFunc(GL_LESS);
 
@@ -334,10 +347,11 @@ void KeyCallback(GLFWwindow *window, int key, int scan, int act, int mode)
 		try
 		{
 			ballFactory.addBall();
+			std::cout << "Current number of metaballs:" << ballFactory.mMetaballs.size() << "." << std::endl;
 		}
 		catch(std::exception)
 		{
-			std::cout << "Cannot add more than " << ballFactory.maxNum << " balls.";
+			std::cout << "Cannot add more than " << ballFactory.maxNum << " balls." << std::endl;
 		}
 	}
 
@@ -346,10 +360,23 @@ void KeyCallback(GLFWwindow *window, int key, int scan, int act, int mode)
 		try
 		{
 			ballFactory.deleteBall();
+			std::cout << "Current number of metaballs:" << ballFactory.mMetaballs.size() << "." << std::endl;
 		}
 		catch (std::exception)
 		{
-			std::cout << "Cannot have less than " << ballFactory.minNum << " balls.";
+			std::cout << "Cannot have less than " << ballFactory.minNum << " balls." << std::endl;
+		}
+	}
+
+	if (key == GLFW_KEY_R && act == GLFW_PRESS)
+	{
+		if (recording) {
+			std::cout << "Recording Stopped." << std::endl;
+			recording = false;
+		}
+		else {
+			std::cout << "Start recording..." << std::endl;
+			recording = true;
 		}
 	}
 
